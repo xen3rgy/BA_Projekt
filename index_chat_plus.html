@@ -31,6 +31,9 @@
     .underline-wavy { text-decoration-line: underline; text-decoration-style: wavy; text-decoration-thickness: 3px; text-underline-offset: 6px; }
     .tab-active { border-color: rgb(251 191 36/1); background-color: rgb(254 243 199/0.6); }
     .badge { @apply inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium bg-white/60 dark:bg-gray-900/30; }
+    .spinner { display: inline-block; width: 1.1rem; height: 1.1rem; border-radius: 9999px; border: 2px solid rgb(251 191 36 / 0.6); border-top-color: transparent; animation: spin 0.8s linear infinite; margin-right: 0.45rem; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-backdrop { background: linear-gradient(135deg, rgba(15,23,42,.8), rgba(17,24,39,.8)); }
   </style>
 </head>
 <body class="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 accent-gradient">
@@ -56,7 +59,10 @@
         <a href="#evaluation" class="px-3 py-1.5 rounded-full border hover:bg-gray-50 dark:hover:bg-gray-800">Evaluation</a>
         <a href="#privacy" class="px-3 py-1.5 rounded-full border hover:bg-gray-50 dark:hover:bg-gray-800">Datenschutz</a>
       </nav>
-      <button id="darkToggle" class="rounded-full border px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Dark Mode</button>
+      <div class="flex items-center gap-2">
+        <button id="settingsBtn" class="hidden sm:inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">API Setup</button>
+        <button id="darkToggle" class="rounded-full border px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Dark Mode</button>
+      </div>
     </div>
   </header>
 
@@ -129,6 +135,11 @@
       </span>
     </div>
     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Zwei Modi: <strong>Übersetzer</strong> (HD → Dialekt) und <strong>Dialekt‑Chat</strong> (logische Antworten im Dialekt).</p>
+    <div class="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-amber-700 bg-amber-100/70 dark:bg-amber-500/20 dark:text-amber-100">
+      <span class="hidden sm:inline">Tipp:</span>
+      <button type="button" class="font-semibold underline decoration-dotted" id="settingsHintBtn">API‑Key eintragen</button>
+      für echte KI‑Antworten – sonst greifen die Offline‑Regeln.
+    </div>
 
     <div class="mt-6">
       <!-- Tabs -->
@@ -202,6 +213,7 @@
                 <button id="chatSend" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Senden</button>
               </div>
               <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                <button id="chatReset" class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800">Chat zurücksetzen</button>
                 <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Wie geht's dir heute?">Wie geht's?</button>
                 <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Was ist das Wetter in Villach?">Wetter</button>
                 <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Wo kann ich heute gut essen?">Tipp</button>
@@ -234,6 +246,51 @@
       </div>
     </div>
   </section>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+    <div class="absolute inset-0 modal-backdrop opacity-80"></div>
+    <div class="relative w-full max-w-2xl rounded-3xl border shadow-xl bg-white/90 dark:bg-gray-950/95 text-gray-900 dark:text-gray-100 p-6 sm:p-8">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-semibold">API‑Konfiguration</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Nutze OpenAI, OpenRouter oder einen kompatiblen Endpoint. Der Schlüssel wird nur lokal gespeichert.</p>
+        </div>
+        <button id="settingsClose" class="rounded-full border px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Schließen</button>
+      </div>
+      <form id="settingsForm" class="mt-6 grid gap-4">
+        <label class="grid gap-1 text-sm">
+          <span class="font-semibold">API‑Key <span class="text-red-500">*</span></span>
+          <input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-..." class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+          <span class="text-xs text-gray-500 dark:text-gray-400">Wird verschlüsselt im LocalStorage gespeichert. Für Tests kann auch ein temporärer Key verwendet werden.</span>
+        </label>
+        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+          <label class="grid gap-1">
+            <span class="font-semibold">Base‑URL (optional)</span>
+            <input id="apiUrlInput" type="text" placeholder="https://api.openai.com/v1" class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+            <span class="text-xs text-gray-500 dark:text-gray-400">Leer lassen für OpenAI. Für OpenRouter z. B. <code>https://openrouter.ai/api/v1</code>.</span>
+          </label>
+          <label class="grid gap-1">
+            <span class="font-semibold">Modell</span>
+            <input id="apiModelInput" type="text" placeholder="gpt-4o-mini" class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+            <span class="text-xs text-gray-500 dark:text-gray-400">Beliebiges Chat‑Completion‑Modell. Empfohlen: <code>gpt-4o-mini</code> oder <code>gpt-3.5-turbo</code>.</span>
+          </label>
+        </div>
+        <label class="grid gap-1 text-sm">
+          <span class="font-semibold">Temperatur</span>
+          <input id="apiTempInput" type="number" min="0" max="2" step="0.1" class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+          <span class="text-xs text-gray-500 dark:text-gray-400">0.0 = sehr deterministisch, 0.7 = kreativer Dialekt. Standard 0.3.</span>
+        </label>
+        <div class="rounded-2xl border bg-amber-50/70 dark:bg-amber-500/10 px-4 py-3 text-xs text-amber-800 dark:text-amber-200">
+          <strong>Hinweis:</strong> Browser‑Fetch kann Keys nicht schützen. Für Produktivbetrieb Backend‑Proxy verwenden!
+        </div>
+        <div class="flex flex-wrap justify-end gap-2 pt-2">
+          <button type="button" id="settingsReset" class="rounded-full border px-4 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Zurücksetzen</button>
+          <button type="submit" class="rounded-full border px-4 py-2 text-xs font-semibold bg-amber-400/70 hover:bg-amber-400 text-gray-900">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Features -->
   <section id="features" class="relative py-16">
@@ -330,6 +387,8 @@
     </div>
   </footer>
 
+  <div id="toast" class="hidden fixed bottom-6 right-6 max-w-sm rounded-2xl border px-4 py-3 text-sm font-medium shadow-lg bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-gray-100"></div>
+
   <script>
     // --- Dark mode persistence ---
     (function() {
@@ -386,7 +445,7 @@
     const input = document.getElementById('input');
     const sendBtn = document.getElementById('sendBtn');
 
-    function addBubble(container, text, role) {
+    function addBubble(container, text, role, opts = {}) {
       const div = document.createElement('div');
       if (role === 'user') {
         div.className = 'ml-auto max-w-[85%] rounded-2xl border px-3 py-2 bg-white';
@@ -395,25 +454,172 @@
       } else {
         div.className = 'mx-auto text-xs text-gray-500';
       }
-      div.textContent = text;
+      if (opts.asHTML) {
+        div.innerHTML = text;
+      } else {
+        div.textContent = text;
+      }
       container.appendChild(div);
       container.scrollTop = container.scrollHeight;
+      return div;
     }
 
-    function sendMessage() {
+    const toastEl = document.getElementById('toast');
+    let toastTimeout;
+
+    function showToast(message, tone = 'info') {
+      if (!toastEl) return;
+      toastEl.textContent = message;
+      toastEl.classList.remove('hidden');
+      toastEl.classList.toggle('border-emerald-400', tone === 'success');
+      toastEl.classList.toggle('border-amber-400', tone === 'info');
+      toastEl.classList.toggle('border-red-400', tone === 'error');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toastEl.classList.add('hidden'), 4200);
+    }
+
+    const apiConfig = {
+      key: localStorage.getItem('rk-api-key') || '',
+      url: localStorage.getItem('rk-api-url') || '',
+      model: localStorage.getItem('rk-api-model') || 'gpt-4o-mini',
+      temperature: parseFloat(localStorage.getItem('rk-api-temp') || '0.3'),
+    };
+
+    const settingsModal = document.getElementById('settingsModal');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsClose = document.getElementById('settingsClose');
+    const settingsForm = document.getElementById('settingsForm');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const apiUrlInput = document.getElementById('apiUrlInput');
+    const apiModelInput = document.getElementById('apiModelInput');
+    const apiTempInput = document.getElementById('apiTempInput');
+    const settingsReset = document.getElementById('settingsReset');
+
+    function applySettingsToForm() {
+      if (apiKeyInput) apiKeyInput.value = apiConfig.key;
+      if (apiUrlInput) apiUrlInput.value = apiConfig.url;
+      if (apiModelInput) apiModelInput.value = apiConfig.model;
+      if (apiTempInput) apiTempInput.value = apiConfig.temperature ?? 0.3;
+    }
+
+    function openSettings() {
+      if (!settingsModal) return;
+      settingsModal.classList.remove('hidden');
+      settingsModal.classList.add('flex');
+      applySettingsToForm();
+    }
+
+    function closeSettings() {
+      if (!settingsModal) return;
+      settingsModal.classList.add('hidden');
+      settingsModal.classList.remove('flex');
+    }
+
+    settingsBtn?.addEventListener('click', openSettings);
+    document.getElementById('settingsHintBtn')?.addEventListener('click', openSettings);
+    settingsClose?.addEventListener('click', closeSettings);
+    settingsModal?.addEventListener('click', (evt) => {
+      if (evt.target === settingsModal) closeSettings();
+    });
+
+    settingsForm?.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      apiConfig.key = apiKeyInput.value.trim();
+      apiConfig.url = apiUrlInput.value.trim();
+      apiConfig.model = apiModelInput.value.trim() || 'gpt-4o-mini';
+      apiConfig.temperature = parseFloat(apiTempInput.value || '0.3');
+      if (Number.isNaN(apiConfig.temperature)) apiConfig.temperature = 0.3;
+      localStorage.setItem('rk-api-key', apiConfig.key);
+      localStorage.setItem('rk-api-url', apiConfig.url);
+      localStorage.setItem('rk-api-model', apiConfig.model);
+      localStorage.setItem('rk-api-temp', apiConfig.temperature.toString());
+      closeSettings();
+      showToast('API‑Einstellungen gespeichert.', 'success');
+    });
+
+    settingsReset?.addEventListener('click', () => {
+      apiConfig.key = '';
+      apiConfig.url = '';
+      apiConfig.model = 'gpt-4o-mini';
+      apiConfig.temperature = 0.3;
+      localStorage.removeItem('rk-api-key');
+      localStorage.removeItem('rk-api-url');
+      localStorage.removeItem('rk-api-model');
+      localStorage.removeItem('rk-api-temp');
+      applySettingsToForm();
+      showToast('API‑Einstellungen zurückgesetzt. Fallback‑Regeln werden verwendet.', 'info');
+    });
+
+    applySettingsToForm();
+
+    async function callLLM(messages, { purpose } = {}) {
+      if (!apiConfig.key) {
+        throw new Error('Kein API‑Key konfiguriert. Öffne „API Setup“ und trage einen Schlüssel ein.');
+      }
+      const endpoint = (apiConfig.url || 'https://api.openai.com/v1').replace(/\/$/, '') + '/chat/completions';
+      const payload = {
+        model: apiConfig.model || 'gpt-4o-mini',
+        messages,
+        temperature: typeof apiConfig.temperature === 'number' && !Number.isNaN(apiConfig.temperature)
+          ? apiConfig.temperature : 0.3,
+      };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + apiConfig.key,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errTxt = await res.text();
+        throw new Error('API‑Fehler (' + res.status + '): ' + errTxt);
+      }
+      const data = await res.json();
+      const content = data?.choices?.[0]?.message?.content?.trim();
+      if (!content) throw new Error('Keine Antwort vom Modell erhalten.');
+      return content;
+    }
+
+    const translatorSystemPrompt = 'Du bist ein hochpräziser Übersetzer für mittelkärntnerischen Dialekt. Gib nur den übersetzten Satz zurück, keine Erklärungen. Pflege informellen, warmherzigen Ton, bleib logisch.';
+    const chatSystemPrompt = 'Du bist ein smarter Chatbot aus Kärnten. Antworte immer im mittelkärntnerischen Dialekt, kurze klare Sätze, logisch und hilfreich. Vermeide Hochdeutsch. Bleib respektvoll, keine verletzenden Inhalte.';
+
+    async function translateHDToDialekt(text) {
+      const msgs = [
+        { role: 'system', content: translatorSystemPrompt },
+        { role: 'user', content: 'Übersetze ins mittelkärntnerische Dialektdeutsch. Gib nur den Dialekt zurück. Text: "' + text + '"' },
+      ];
+      return callLLM(msgs, { purpose: 'translate' });
+    }
+
+    async function chatWithDialect(history) {
+      const msgs = [{ role: 'system', content: chatSystemPrompt }, ...history];
+      return callLLM(msgs, { purpose: 'chat' });
+    }
+
+    function createThinking(container) {
+      return addBubble(container, '<span class="spinner"></span><span class="align-middle">… denk nach</span>', 'assistant', { asHTML: true });
+    }
+
+    async function sendMessage() {
       const t = input.value.trim();
       if (!t) return;
       addBubble(messages, t, 'user');
       input.value = '';
-      const thinking = document.createElement('div');
-      thinking.className = 'mr-auto max-w-[85%] rounded-2xl border px-3 py-2 text-gray-500 text-sm';
-      thinking.textContent = '… denk nach';
-      messages.appendChild(thinking);
-      messages.scrollTop = messages.scrollHeight;
-      setTimeout(() => {
+      const thinking = createThinking(messages);
+      try {
+        const translated = await translateHDToDialekt(t);
         messages.removeChild(thinking);
-        addBubble(messages, toKaerntnerisch(t), 'assistant');
-      }, 300);
+        addBubble(messages, translated, 'assistant');
+      } catch (err) {
+        console.error(err);
+        messages.removeChild(thinking);
+        const fallback = toKaerntnerisch(t) || 'I bin ma ned sicher – probier da Key in da API‑Konfiguration ei zum tragen.';
+        addBubble(messages, fallback, 'assistant');
+        showToast(err.message, 'error');
+      }
     }
 
     input?.addEventListener('keydown', (e) => {
@@ -453,6 +659,8 @@
     const chatMsgs = document.getElementById('chatMsgs');
     const chatInput = document.getElementById('chatInput');
     const chatSend = document.getElementById('chatSend');
+    const chatResetBtn = document.getElementById('chatReset');
+    const chatIntroText = chatMsgs?.querySelector('div')?.textContent?.trim() || 'Frag wos – i probier gscheit zu antwortn (im Dialekt).';
 
     const lokaltipps = [
       'Geh am Drauufer spaziern und hol da a Eis – simpel, oba guat.',
@@ -497,24 +705,42 @@
       addBubble(container, text, role);
     }
 
+    let chatHistory = [];
+
     function sendChat() {
       const t = chatInput.value.trim();
       if (!t) return;
       chatAdd(chatMsgs, t, 'user');
       chatInput.value = '';
-      const thinking = document.createElement('div');
-      thinking.className = 'mr-auto max-w-[85%] rounded-2xl border px-3 py-2 text-gray-500 text-sm';
-      thinking.textContent = '… denk nach';
-      chatMsgs.appendChild(thinking);
+      chatHistory.push({ role: 'user', content: t });
+      const thinking = createThinking(chatMsgs);
       chatMsgs.scrollTop = chatMsgs.scrollHeight;
-      setTimeout(() => {
-        chatMsgs.removeChild(thinking);
-        chatAdd(chatMsgs, replyFor(t), 'assistant');
-      }, 350);
+      (async () => {
+        try {
+          const answer = await chatWithDialect(chatHistory);
+          chatHistory.push({ role: 'assistant', content: answer });
+          chatMsgs.removeChild(thinking);
+          addBubble(chatMsgs, answer, 'assistant');
+        } catch (err) {
+          console.error(err);
+          chatMsgs.removeChild(thinking);
+          const fallback = replyFor(t);
+          chatHistory.push({ role: 'assistant', content: fallback });
+          addBubble(chatMsgs, fallback, 'assistant');
+          showToast(err.message, 'error');
+        }
+      })();
     }
 
     chatInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } });
     chatSend?.addEventListener('click', sendChat);
+    chatResetBtn?.addEventListener('click', () => {
+      chatHistory = [];
+      if (!chatMsgs) return;
+      chatMsgs.innerHTML = '';
+      addBubble(chatMsgs, chatIntroText, 'meta');
+      showToast('Chat zurückgesetzt.', 'info');
+    });
     document.querySelectorAll('.chat-ex').forEach(btn => { btn.addEventListener('click', () => { chatInput.value = btn.dataset.ex; chatInput.focus(); }); });
 
     // --- Tabs toggle ---
