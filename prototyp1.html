@@ -5,11 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Red ma Kärntnerisch! – Prototype (Übersetzer + Dialekt‑Chat)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' };</script>
   <meta name="color-scheme" content="light dark">
-  <style>
+    <script>
+    // set initial theme before paint to avoid flicker
+    (function() {
+      try {
+        var saved = localStorage.getItem('rk-dark') === '1';
+        if (saved) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+	</script>
+<style>
     :root { --ring: 240 5% 64%; }
-    .glass { @apply bg-white/70 dark:bg-gray-900/40 backdrop-blur; }
-    .card { @apply rounded-3xl border shadow-sm; }
+    /* Replaced Tailwind @apply with plain CSS so it works without a build step */
+    .glass {
+      background-color: rgba(255,255,255,0.70);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .dark .glass {
+      background-color: rgba(17,24,39,0.40); /* gray-900/40 */
+    }
+    .card {
+      border-radius: 1.5rem; /* rounded-3xl */
+      border: 1px solid rgba(229,231,235,1); /* gray-200 */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    .dark .card { border-color: rgba(31,41,55,1); /* gray-800 */ }
     .ringed { box-shadow: 0 0 0 1px hsl(var(--ring)); }
     .accent-gradient {
       background-image: radial-gradient(40% 60% at 10% 10%, rgba(251,191,36,.35) 0, rgba(251,191,36,0) 60%),
@@ -18,22 +41,28 @@
     }
     .grid-bg {
       background-image:
-        linear-gradient(to right, rgb(0 0 0 / .04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgb(0 0 0 / .04) 1px, transparent 1px);
+        linear-gradient(to right, rgba(0,0,0,.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,.04) 1px, transparent 1px);
       background-size: 24px 24px;
     }
     .dark .grid-bg {
       background-image:
-        linear-gradient(to right, rgb(255 255 255 / .06) 1px, transparent 1px),
-        linear-gradient(to bottom, rgb(255 255 255 / .06) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
     }
     .shine:hover { transform: translateY(-1px); }
     .underline-wavy { text-decoration-line: underline; text-decoration-style: wavy; text-decoration-thickness: 3px; text-underline-offset: 6px; }
     .tab-active { border-color: rgb(251 191 36/1); background-color: rgb(254 243 199/0.6); }
-    .badge { @apply inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium bg-white/60 dark:bg-gray-900/30; }
-    .spinner { display: inline-block; width: 1.1rem; height: 1.1rem; border-radius: 9999px; border: 2px solid rgb(251 191 36 / 0.6); border-top-color: transparent; animation: spin 0.8s linear infinite; margin-right: 0.45rem; vertical-align: middle; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .modal-backdrop { background: linear-gradient(135deg, rgba(15,23,42,.8), rgba(17,24,39,.8)); }
+    .badge {
+      display: inline-flex; align-items: center; border-radius: 9999px;
+      border: 1px solid rgba(229,231,235,1); padding: 0.25rem 0.625rem;
+      font-size: 0.75rem; line-height: 1rem; font-weight: 500;
+      background: rgba(255,255,255,0.6);
+    }
+    .dark .badge {
+      border-color: rgba(31,41,55,1);
+      background: rgba(17,24,39,0.3);
+    }
   </style>
 </head>
 <body class="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 accent-gradient">
@@ -392,17 +421,17 @@
   <script>
     // --- Dark mode persistence ---
     (function() {
-      const saved = localStorage.getItem('rk-dark') === '1';
-      document.documentElement.classList.toggle('dark', saved);
       const btn = document.getElementById('darkToggle');
-      btn.textContent = saved ? 'Light Mode' : 'Dark Mode';
+      function syncLabel() {
+        btn.textContent = document.documentElement.classList.contains('dark') ? 'Light Mode' : 'Dark Mode';
+      }
+      syncLabel();
       btn.addEventListener('click', function() {
         const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('rk-dark', isDark ? '1' : '0');
-        this.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        try { localStorage.setItem('rk-dark', isDark ? '1' : '0'); } catch(e) {}
+        syncLabel();
       });
     })();
-
     // --- Year in footer ---
     document.getElementById('year').textContent = new Date().getFullYear();
 
