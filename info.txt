@@ -1,0 +1,9 @@
+Summary
+
+Zerlegte prototyp1.html in schlanke Platzhalter, die ihre Inhalte aus modularen Abschnittsdateien beziehen, und ergänzte einen Loader für die HTML-Partials.
+
+Extrahierte wiederverwendbare Styles – inklusive Modal-Backdrop und Spinner – in eine kommentierte Stylesheet-Datei, um das Markup übersichtlich zu halten.
+
+Strukturierte die Interaktivität in ES-Module für Initialisierung, Einstellungen, Übersetzer-Workflow und Dialekt-Chat, sodass das Verhalten erhalten bleibt und besser wartbar ist.
+
+Hinweis: Die Partials werden per fetch geladen – bitte die Seite über einen lokalen Webserver statt direkt aus dem Dateisystem öffnen.
