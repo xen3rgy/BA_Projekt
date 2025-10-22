@@ -1,0 +1,114 @@
+<!-- Interactive live demo -->
+<section id="demo" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Live‑Demo</h2>
+    <span class="inline-flex items-center gap-2 text-xs font-medium text-gray-500">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Mock · Kein Backend
+    </span>
+  </div>
+  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+    Zwei Modi: <strong>Übersetzer</strong> (HD → Dialekt) und <strong>Dialekt‑Chat</strong> (logische Antworten im Dialekt).
+  </p>
+  <div class="mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-amber-700 bg-amber-100/70 dark:bg-amber-500/20 dark:text-amber-100">
+    <span class="hidden sm:inline">Tipp:</span>
+    <button type="button" class="font-semibold underline decoration-dotted" id="settingsHintBtn">API‑Key eintragen</button>
+    für echte KI‑Antworten – sonst greifen die Offline‑Regeln.
+  </div>
+  <div class="mt-6">
+    <div class="flex gap-2">
+      <button id="tabTrans" class="tab-btn rounded-full border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 tab-active">Übersetzer</button>
+      <button id="tabChat" class="tab-btn rounded-full border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Dialekt‑Chat</button>
+    </div>
+    <div class="mt-4">
+      <div id="panelTrans">
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Translator chat -->
+          <div class="rounded-3xl border shadow-sm overflow-hidden bg-white/70 dark:bg-gray-900/40">
+            <div class="p-4 border-b bg-gray-50/60 dark:bg-gray-900/40 flex items-center justify-between">
+              <div class="font-semibold">Übersetzer</div>
+              <div class="text-xs text-gray-500">Enter = senden</div>
+            </div>
+            <div id="messages" class="p-4 space-y-3 max-h-[380px] overflow-auto">
+              <div class="mx-auto text-xs text-gray-500">
+                Schreib auf Hochdeutsch. Ich antworte im Kärntner Dialekt (wörtliche Übersetzung).
+              </div>
+            </div>
+            <div class="p-3 border-t bg-white/60 dark:bg-gray-900/40">
+              <div class="flex gap-2">
+                <textarea id="input" placeholder="Schreib auf Hochdeutsch …" class="flex-1 resize-none rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" rows="1"></textarea>
+                <button id="sendBtn" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Senden</button>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 ex-btn" data-ex="Guten Tag, wie geht es dir?">Beispiel 1</button>
+                <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 ex-btn" data-ex="Ich habe das nicht gewusst.">Beispiel 2</button>
+                <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 ex-btn" data-ex="Das ist sehr gut!">Beispiel 3</button>
+              </div>
+            </div>
+          </div>
+          <!-- Audio mock tools -->
+          <div class="card glass ringed p-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="recBtn" class="shine transition rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Aufnahme starten (Mock)</button>
+              <button id="sttBtn" class="shine transition rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Transkribieren (Mock STT)</button>
+              <button id="ttsBtn" class="shine transition rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Abspielen (Mock TTS)</button>
+            </div>
+            <div class="mt-4 grid md:grid-cols-2 gap-3 text-sm">
+              <div>
+                <div class="text-xs text-gray-500 mb-1">Whisper‑Text (Mock)</div>
+                <div id="sttText" class="rounded-xl border p-3 bg-white min-h-[64px]">—</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-500 mb-1">Kärntnerisch</div>
+                <div id="dialektText" class="rounded-xl border p-3 bg-amber-50 min-h-[64px]">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="panelChat" class="hidden">
+        <div class="rounded-3xl border shadow-sm overflow-hidden bg-white/70 dark:bg-gray-900/40">
+          <div class="p-4 border-b bg-gray-50/60 dark:bg-gray-900/40 flex items-center justify-between">
+            <div class="font-semibold">Dialekt‑Chat</div>
+            <div class="text-xs text-gray-500">Stell Fragen – der Bot antwortet logisch im Dialekt</div>
+          </div>
+          <div id="chatMsgs" data-intro="Frag wos – i probier gscheit zu antwortn (im Dialekt)." class="p-4 space-y-3 max-h-[420px] overflow-auto">
+            <div class="mx-auto text-xs text-gray-500">Frag wos – i probier gscheit zu antwortn (im Dialekt).</div>
+          </div>
+          <div class="p-3 border-t bg-white/60 dark:bg-gray-900/40">
+            <div class="flex gap-2">
+              <textarea id="chatInput" placeholder="Dei Frog …" class="flex-1 resize-none rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" rows="1"></textarea>
+              <button id="chatSend" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Senden</button>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2 text-xs">
+              <button id="chatReset" class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800">Chat zurücksetzen</button>
+              <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Wie geht's dir heute?">Wie geht's?</button>
+              <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Was ist das Wetter in Villach?">Wetter</button>
+              <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Wo kann ich heute gut essen?">Tipp</button>
+              <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Kannst du mir bei der Aufgabe helfen?">Hilfe</button>
+              <button class="rounded-full border px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 chat-ex" data-ex="Hast du einen Motivationstipp fürs Studium?">Motivation</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 text-sm">
+          <div class="card glass ringed p-4">
+            <div class="font-semibold mb-1">Beispiele, die gut funktionieren</div>
+            <ul class="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-300">
+              <li>„Was mach i heut in Villach?“</li>
+              <li>„Hast a Lokal‑Empfehlung?“</li>
+              <li>„Kannst ma bei Mathe helfen?“</li>
+              <li>„Wie lern i gscheit fürs Examen?“</li>
+            </ul>
+          </div>
+          <div class="card glass ringed p-4">
+            <div class="font-semibold mb-1">Stil</div>
+            <p class="text-gray-600 dark:text-gray-300">Mittelkärntnerisch, freundlich‑direkt, kurze Sätze, praxisnah.</p>
+          </div>
+          <div class="card glass ringed p-4">
+            <div class="font-semibold mb-1">Grenzen</div>
+            <p class="text-gray-600 dark:text-gray-300">Kein Internetzugriff, keine echten Buchungen, Antworten sind heuristisch.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
