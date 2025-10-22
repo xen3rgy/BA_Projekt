@@ -1,0 +1,44 @@
+<!-- Settings modal -->
+<div id="settingsModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+  <div class="absolute inset-0 modal-backdrop opacity-80"></div>
+  <div class="relative w-full max-w-2xl rounded-3xl border shadow-xl bg-white/90 dark:bg-gray-950/95 text-gray-900 dark:text-gray-100 p-6 sm:p-8">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-xl font-semibold">API‑Konfiguration</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Nutze OpenAI, OpenRouter oder einen kompatiblen Endpoint. Der Schlüssel wird nur lokal gespeichert.</p>
+      </div>
+      <button id="settingsClose" class="rounded-full border px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Schließen</button>
+    </div>
+    <form id="settingsForm" class="mt-6 grid gap-4">
+      <label class="grid gap-1 text-sm">
+        <span class="font-semibold">API‑Key <span class="text-red-500">*</span></span>
+        <input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-..." class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+        <span class="text-xs text-gray-500 dark:text-gray-400">Wird verschlüsselt im LocalStorage gespeichert. Für Tests kann auch ein temporärer Key verwendet werden.</span>
+      </label>
+      <div class="grid sm:grid-cols-2 gap-4 text-sm">
+        <label class="grid gap-1">
+          <span class="font-semibold">Base‑URL (optional)</span>
+          <input id="apiUrlInput" type="text" placeholder="https://api.openai.com/v1" class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+          <span class="text-xs text-gray-500 dark:text-gray-400">Leer lassen für OpenAI. Für OpenRouter z. B. <code>https://openrouter.ai/api/v1</code>.</span>
+        </label>
+        <label class="grid gap-1">
+          <span class="font-semibold">Modell</span>
+          <input id="apiModelInput" type="text" placeholder="gpt-4o-mini" class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+          <span class="text-xs text-gray-500 dark:text-gray-400">Beliebiges Chat‑Completion‑Modell. Empfohlen: <code>gpt-4o-mini</code> oder <code>gpt-3.5-turbo</code>.</span>
+        </label>
+      </div>
+      <label class="grid gap-1 text-sm">
+        <span class="font-semibold">Temperatur</span>
+        <input id="apiTempInput" type="number" min="0" max="2" step="0.1" class="rounded-xl border px-3 py-2 bg-white/80 dark:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-amber-300" />
+        <span class="text-xs text-gray-500 dark:text-gray-400">0.0 = sehr deterministisch, 0.7 = kreativer Dialekt. Standard 0.3.</span>
+      </label>
+      <div class="rounded-2xl border bg-amber-50/70 dark:bg-amber-500/10 px-4 py-3 text-xs text-amber-800 dark:text-amber-200">
+        <strong>Hinweis:</strong> Browser‑Fetch kann Keys nicht schützen. Für Produktivbetrieb Backend‑Proxy verwenden!
+      </div>
+      <div class="flex flex-wrap justify-end gap-2 pt-2">
+        <button type="button" id="settingsReset" class="rounded-full border px-4 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Zurücksetzen</button>
+        <button type="submit" class="rounded-full border px-4 py-2 text-xs font-semibold bg-amber-400/70 hover:bg-amber-400 text-gray-900">Speichern</button>
+      </div>
+    </form>
+  </div>
+</div>
